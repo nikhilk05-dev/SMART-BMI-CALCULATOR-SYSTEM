@@ -1,0 +1,216 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+// Structure to store user details
+struct User
+{
+    char name[50];
+    char gender[10];
+    int age;
+    float height;
+    float weight;
+    float bmi;
+};
+
+// Function declarations
+float calculateBMI(float height, float weight);
+void displayCategory(float bmi);
+void displayTips(float bmi);
+void calculateHealthyWeight(float height);
+void displayBMIChart();
+void displayReport(struct User u);
+void saveRecord(struct User u);
+
+int main()
+{
+    struct User u;
+
+    printf("\n====================================");
+    printf("\n     SMART BMI CALCULATOR SYSTEM");
+    printf("\n====================================");
+
+    // Taking user details
+    printf("\n\nEnter Name: ");
+    scanf(" %49[^\n]", u.name);
+
+    printf("Enter Gender (Male/Female): ");
+    scanf("%9s", u.gender);
+
+    for (int i = 0; u.gender[i]; i++)
+        u.gender[i] = tolower((unsigned char)u.gender[i]);
+
+    if (strcmp(u.gender, "male") != 0 &&
+        strcmp(u.gender, "female") != 0)
+    {
+        printf("\nInvalid Gender!");
+        return 1;
+    }
+
+    printf("Enter Age: ");
+    if (scanf("%d", &u.age) != 1 || u.age <= 0)
+    {
+        printf("\nInvalid Age!");
+        return 1;
+    }
+
+    printf("Enter Height (cm): ");
+    if (scanf("%f", &u.height) != 1 ||
+        u.height <= 0 || u.height > 300)
+    {
+        printf("\nInvalid Height!");
+        return 1;
+    }
+
+    printf("Enter Weight (kg): ");
+    if (scanf("%f", &u.weight) != 1 ||
+        u.weight <= 0 || u.weight > 500)
+    {
+        printf("\nInvalid Weight!");
+        return 1;
+    }
+
+    // Convert height into metres
+    u.height = u.height / 100;
+
+    // Calculate BMI
+    u.bmi = calculateBMI(u.height, u.weight);
+
+    // Display complete report
+    displayReport(u);
+
+    // Save record
+    saveRecord(u);
+
+    return 0;
+}
+
+// Function to calculate BMI
+float calculateBMI(float height, float weight)
+{
+    return weight / (height * height);
+}
+
+// Function to display BMI category
+void displayCategory(float bmi)
+{
+    if (bmi < 18.5)
+        printf("Category: Underweight\n");
+    else if (bmi < 25)
+        printf("Category: Normal Weight\n");
+    else if (bmi < 30)
+        printf("Category: Overweight\n");
+    else
+        printf("Category: Obesity\n");
+}
+
+// Function to display health tips
+void displayTips(float bmi)
+{
+    printf("\n========== HEALTH TIPS ==========\n");
+
+    if (bmi < 18.5)
+    {
+        printf("1. Eat balanced and nutritious meals.\n");
+        printf("2. Include protein-rich foods.\n");
+        printf("3. Eat meals regularly.\n");
+        printf("4. Consult a healthcare professional if needed.\n");
+    }
+    else if (bmi < 25)
+    {
+        printf("1. Maintain a balanced diet.\n");
+        printf("2. Exercise regularly.\n");
+        printf("3. Drink enough water.\n");
+        printf("4. Get proper sleep.\n");
+    }
+    else if (bmi < 30)
+    {
+        printf("1. Choose nutritious food.\n");
+        printf("2. Include regular physical activity.\n");
+        printf("3. Limit sugary drinks.\n");
+        printf("4. Maintain healthy eating habits.\n");
+    }
+    else
+    {
+        printf("1. Follow a balanced eating plan.\n");
+        printf("2. Start suitable physical activity.\n");
+        printf("3. Maintain a regular sleep schedule.\n");
+        printf("4. Seek professional health guidance.\n");
+    }
+
+    printf("=================================\n");
+}
+
+// Function to calculate healthy weight range
+void calculateHealthyWeight(float height)
+{
+    float minWeight, maxWeight;
+
+    minWeight = 18.5 * height * height;
+    maxWeight = 24.9 * height * height;
+
+    printf("\nHealthy Weight Range: %.2f - %.2f kg\n",
+           minWeight, maxWeight);
+}
+
+// Function to display BMI chart
+void displayBMIChart()
+{
+    printf("\n========== BMI CHART ==========\n");
+    printf("\nBMI RANGE       CATEGORY");
+    printf("\nBelow 18.5      Underweight");
+    printf("\n18.5 - 24.9     Normal Weight");
+    printf("\n25.0 - 29.9     Overweight");
+    printf("\n30.0 or above   Obesity");
+    printf("\n================================\n");
+}
+
+// Function to display BMI report
+void displayReport(struct User u)
+{
+    printf("\n====================================");
+    printf("\n             BMI REPORT");
+    printf("\n====================================");
+
+    printf("\nName       : %s", u.name);
+    printf("\nGender     : %s", u.gender);
+    printf("\nAge        : %d", u.age);
+    printf("\nHeight     : %.2f cm", u.height * 100);
+    printf("\nWeight     : %.2f kg", u.weight);
+    printf("\nBMI        : %.2f\n", u.bmi);
+
+    displayCategory(u.bmi);
+
+    calculateHealthyWeight(u.height);
+
+    displayBMIChart();
+
+    displayTips(u.bmi);
+
+    printf("\n====================================\n");
+}
+
+// Function to save record in file
+void saveRecord(struct User u)
+{
+    FILE *fp;
+
+    fp = fopen("bmi_records.txt", "a");
+
+    if (fp == NULL)
+    {
+        printf("\nUnable to save record!");
+        return;
+    }
+
+    fprintf(fp, "Name: %s\n", u.name);
+    fprintf(fp, "Gender: %s\n", u.gender);
+    fprintf(fp, "Age: %d\n", u.age);
+    fprintf(fp, "Height: %.2f cm\n", u.height * 100);
+    fprintf(fp, "Weight: %.2f kg\n", u.weight);
+    fprintf(fp, "BMI: %.2f\n\n", u.bmi);
+
+    fclose(fp);
+
+    printf("\nRecord saved successfully!");
+}
